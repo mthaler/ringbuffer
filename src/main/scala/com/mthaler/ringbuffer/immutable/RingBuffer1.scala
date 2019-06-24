@@ -2,7 +2,7 @@ package com.mthaler.ringbuffer.immutable
 
 import scala.collection.{AbstractIterator, Iterator, immutable}
 
-class RingBuffer1[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) extends immutable.Iterable[A] {
+final class RingBuffer1[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) extends immutable.Iterable[A] {
 
   self =>
 

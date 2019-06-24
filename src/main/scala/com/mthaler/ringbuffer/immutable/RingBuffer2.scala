@@ -2,7 +2,7 @@ package com.mthaler.ringbuffer.immutable
 
 import scala.collection._
 
-class RingBuffer2[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any])
+final class RingBuffer2[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any])
   extends immutable.Iterable[A] with IterableOps[A, RingBuffer2, RingBuffer2[A]] { self =>
 
   def this(capacity: Int) = this(capacity, readPos = 0, writePos = 0, _count = 0, elems = Array.ofDim(capacity))

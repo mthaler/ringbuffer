@@ -1,9 +1,9 @@
 package com.mthaler.ringbuffer
 
-import scala.reflect.ClassTag
+final class RingBuffer[A] private (val capacity: Int, elems: Array[Any]) extends Seq[A] {
 
-class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
-  private val array = new Array[A](maxSize)
+  def this(capacity: Int) = this(capacity, elems = Array.ofDim(capacity))
+
   private var read = 0
   private var write = 0
   private var count_ = 0
@@ -21,7 +21,7 @@ class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
    */
   def apply(i: Int): A = {
     if (i >= count_) throw new IndexOutOfBoundsException(i.toString)
-    else array((read + i) % maxSize)
+    else elems((read + i) % capacity).asInstanceOf[A]
   }
 
   /**
@@ -29,7 +29,7 @@ class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
    */
   def update(i: Int, elem: A): Unit = {
     if (i >= count_) throw new IndexOutOfBoundsException(i.toString)
-    else array((read + i) % maxSize) = elem
+    else elems((read + i) % capacity) = elem
   }
 
   /**
@@ -37,9 +37,9 @@ class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
    * if the buffer is at capacity.
    */
   def +=(elem: A): Unit = {
-    array(write) = elem
-    write = (write + 1) % maxSize
-    if (count_ == maxSize) read = (read + 1) % maxSize
+    elems(write) = elem
+    write = (write + 1) % capacity
+    if (count_ == capacity) read = (read + 1) % capacity
     else count_ += 1
   }
 
@@ -59,8 +59,8 @@ class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
   def next: A = {
     if (read == write) throw new NoSuchElementException
     else {
-      val res = array(read)
-      read = (read + 1) % maxSize
+      val res = elems(read).asInstanceOf[A]
+      read = (read + 1) % capacity
       count_ -= 1
       res
     }
@@ -77,8 +77,8 @@ class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
   }
 
   override def drop(n: Int): RingBuffer[A] = {
-    if (n >= maxSize) clear()
-    else read = (read + n) % maxSize
+    if (n >= capacity) clear()
+    else read = (read + n) % capacity
     this
   }
 
@@ -94,7 +94,7 @@ class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
       }
     }
     count_ -= rmCount_
-    write = (read + count_) % maxSize
+    write = (read + count_) % capacity
     rmCount_
   }
 }

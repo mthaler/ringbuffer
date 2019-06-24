@@ -29,12 +29,12 @@ final class RingBuffer[A] private(val capacity: Int, readPos: Int, writePos: Int
 
   override def view: IndexedSeqView[A] = new IndexedSeqView[A] {
 
-    def length: Int = self.size
+    def length: Int = self._count
 
     def apply(i: Int): A = self(i)
   }
 
-  override def knownSize: Int = size
+  override def knownSize: Int = _count
 
   override def className = "RingBuffer"
 

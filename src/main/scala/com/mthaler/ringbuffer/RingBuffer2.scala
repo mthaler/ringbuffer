@@ -29,7 +29,7 @@ class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _c
 
     private var current = 0
 
-    def hasNext: Boolean = current < _count
+    def hasNext: Boolean = current != _count
 
     def next(): A = {
       val res = apply(current)

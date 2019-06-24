@@ -3,7 +3,8 @@ package com.mthaler.ringbuffer.immutable
 import scala.collection._
 
 final class RingBuffer[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any])
-  extends immutable.Iterable[A] with IterableOps[A, RingBuffer, RingBuffer[A]] { self =>
+  extends immutable.Iterable[A] with IterableOps[A, RingBuffer, RingBuffer[A]] with IterableFactoryDefaults[A, RingBuffer]
+  with StrictOptimizedIterableOps[A, RingBuffer, RingBuffer[A]]{ self =>
 
   def this(capacity: Int) = this(capacity, readPos = 0, writePos = 0, _count = 0, elems = Array.ofDim(capacity))
 
@@ -24,34 +25,29 @@ final class RingBuffer[A] private(val capacity: Int, readPos: Int, writePos: Int
 
   @`inline` def :+ [B >: A](elem: B): RingBuffer[B] = appended(elem)
 
-  def iterator: Iterator[A] = new AbstractIterator[A] {
+  def iterator: Iterator[A] = view.iterator
 
-    private var current = 0
+  override def view: IndexedSeqView[A] = new IndexedSeqView[A] {
 
-    def hasNext: Boolean = current != _count
+    def length: Int = self.size
 
-    def next(): A = {
-      val res = apply(current)
-      current += 1
-      res
-    }
+    def apply(i: Int): A = self(i)
   }
+
+  override def knownSize: Int = size
 
   override def className = "RingBuffer"
 
   override val iterableFactory: IterableFactory[RingBuffer] = new RingBufferFactory(capacity)
-
-  override protected def fromSpecific(coll: IterableOnce[A]): RingBuffer[A] = iterableFactory.from(coll)
-
-  override protected def newSpecificBuilder: mutable.Builder[A, RingBuffer[A]] = iterableFactory.newBuilder
-
-  override def empty: RingBuffer[A] = iterableFactory.empty
 }
 
 class RingBufferFactory(capacity: Int) extends IterableFactory[RingBuffer] {
 
   def from[A](source: IterableOnce[A]): RingBuffer[A] =
-    (newBuilder[A] ++= source).result()
+    source match {
+      case ringBuffer: RingBuffer[A] if ringBuffer.capacity == capacity => ringBuffer
+      case _ => (newBuilder[A] ++= source).result()
+    }
 
   def empty[A]: RingBuffer[A] = new RingBuffer[A](capacity)
 

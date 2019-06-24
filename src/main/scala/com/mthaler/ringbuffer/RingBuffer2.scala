@@ -11,6 +11,16 @@ class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _c
     else elems((readPos + i) % capacity).asInstanceOf[A]
   }
 
+  def appended[B >: A](elem: B): RingBuffer2[B] = {
+    val newElems = Array.ofDim[Any](capacity)
+    Array.copy(elems, 0, newElems, 0, capacity)
+    newElems(writePos) = elem
+    val newWritePos = (writePos + 1) % capacity
+    val newReadPos = if (_count == capacity) (readPos + 1) % capacity else readPos
+    val newCount = if (_count != capacity) _count + 1 else _count
+    new RingBuffer2[B](capacity, newReadPos, newWritePos, newCount, newElems)
+  }
+
   def iterator: Iterator[A] = new AbstractIterator[A] {
 
     private var current = 0

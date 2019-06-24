@@ -1,8 +1,10 @@
 package com.mthaler.ringbuffer
 
-import scala.collection.AbstractIterator
+import scala.collection._
 
-class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) {
+class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) extends immutable.Iterable[A] {
+
+  self =>
 
   def this(capacity: Int) = this(capacity, readPos = 0, writePos = 0, _count = 0, elems = Array.ofDim(capacity))
 
@@ -21,6 +23,8 @@ class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _c
     new RingBuffer2[B](capacity, newReadPos, newWritePos, newCount, newElems)
   }
 
+  @`inline` def :+ [B >: A](elem: B): RingBuffer2[B] = appended(elem)
+
   def iterator: Iterator[A] = new AbstractIterator[A] {
 
     private var current = 0
@@ -33,4 +37,6 @@ class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _c
       res
     }
   }
+
+  override def className = "RingBuffer2"
 }

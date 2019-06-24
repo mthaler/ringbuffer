@@ -1,4 +1,4 @@
-package com.mthaler.ringbuffer
+package com.mthaler.ringbuffer.mutable
 
 import org.scalatest.FunSuite
 

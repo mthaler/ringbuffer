@@ -1,8 +1,8 @@
-package com.mthaler.ringbuffer
+package com.mthaler.ringbuffer.immutable
 
 import scala.collection._
 
-class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) extends immutable.Iterable[A] {
+class RingBuffer1[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) extends immutable.Iterable[A] {
 
   self =>
 
@@ -13,17 +13,17 @@ class RingBuffer2[A] private (val capacity: Int, readPos: Int, writePos: Int, _c
     else elems((readPos + i) % capacity).asInstanceOf[A]
   }
 
-  def appended[B >: A](elem: B): RingBuffer2[B] = {
+  def appended[B >: A](elem: B): RingBuffer1[B] = {
     val newElems = Array.ofDim[Any](capacity)
     Array.copy(elems, 0, newElems, 0, capacity)
     newElems(writePos) = elem
     val newWritePos = (writePos + 1) % capacity
     val newReadPos = if (_count == capacity) (readPos + 1) % capacity else readPos
     val newCount = if (_count != capacity) _count + 1 else _count
-    new RingBuffer2[B](capacity, newReadPos, newWritePos, newCount, newElems)
+    new RingBuffer1[B](capacity, newReadPos, newWritePos, newCount, newElems)
   }
 
-  @`inline` def :+ [B >: A](elem: B): RingBuffer2[B] = appended(elem)
+  @`inline` def :+ [B >: A](elem: B): RingBuffer1[B] = appended(elem)
 
   def iterator: Iterator[A] = new AbstractIterator[A] {
 

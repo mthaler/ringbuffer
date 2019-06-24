@@ -1,4 +1,4 @@
-package com.mthaler.ringbuffer
+package com.mthaler.ringbuffer.mutable
 
 final class RingBuffer[A] private (val capacity: Int, elems: Array[Any]) extends Seq[A] {
 

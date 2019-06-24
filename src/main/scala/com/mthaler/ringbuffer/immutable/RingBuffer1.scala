@@ -1,6 +1,6 @@
 package com.mthaler.ringbuffer.immutable
 
-import scala.collection._
+import scala.collection.{AbstractIterator, Iterator, immutable}
 
 class RingBuffer1[A] private(val capacity: Int, readPos: Int, writePos: Int, _count: Int, elems: Array[Any]) extends immutable.Iterable[A] {
 
@@ -38,5 +38,5 @@ class RingBuffer1[A] private(val capacity: Int, readPos: Int, writePos: Int, _co
     }
   }
 
-  override def className = "RingBuffer2"
+  override def className = "RingBuffer1"
 }

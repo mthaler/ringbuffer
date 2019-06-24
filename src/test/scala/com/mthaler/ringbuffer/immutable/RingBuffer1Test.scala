@@ -36,6 +36,7 @@ class RingBuffer1Test extends FunSuite {
 
   test("take") {
     val rb = new RingBuffer1[Int](4) :+ 1 :+ 2 :+ 3 :+ 4
+    assert(rb.take(3).isInstanceOf[List[_]])
     assert(rb.take(3) === List(1, 2, 3))
   }
 }
